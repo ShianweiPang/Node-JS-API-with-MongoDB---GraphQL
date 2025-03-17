@@ -11,6 +11,7 @@ const typeDefs = gql`
     roomNumber: Int!
     checkInDate: Date!
     checkOutDate: Date!
+    status: String
   }
 
   type Query {
@@ -19,7 +20,6 @@ const typeDefs = gql`
 
   type Mutation {
     createHotelReservation(
-      hotelRecordId: String!
       guestName: String!
       guestEmail: String!
       roomNumber: Int!

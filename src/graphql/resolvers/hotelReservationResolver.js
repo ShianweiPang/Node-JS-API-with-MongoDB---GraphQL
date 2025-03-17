@@ -12,7 +12,15 @@ const hotelReservationResolver = {
     records: async (_, __, context) => {
       let collection = await getDB(dbName).collection("HotelReservation");
       const records = await collection.find({}).toArray();
-      return records;
+      return records.map((record) => ({
+        id: record._id.toString(), // Convert `_id` to string and assign to `id`
+        hotelRecordId: record.hotelRecordId,
+        guestName: record.guestName,
+        guestEmail: record.guestEmail,
+        roomNumber: record.roomNumber,
+        checkInDate: record.checkInDate,
+        checkOutDate: record.checkOutDate,
+      }));
     },
   },
   Mutation: {
@@ -29,6 +37,15 @@ const hotelReservationResolver = {
       context
     ) => {
       let collection = await getDB(dbName).collection("HotelReservation");
+      const lastRecord = await collection.findOne({}, { sort: { _id: -1 } });
+      let lastId = 0;
+      if (lastRecord) {
+        lastId = parseInt(lastRecord.hotelRecordId.slice(3));
+      }
+      lastId += 1;
+      const prefix = "HBR";
+      hotelRecordId = `${prefix}${lastId.toString().padStart(4, "0")}`;
+
       const insert = await collection.insertOne({
         hotelRecordId,
         guestName,
@@ -45,9 +62,18 @@ const hotelReservationResolver = {
           roomNumber,
           checkInDate,
           checkOutDate,
-          id: insert.insertedId,
+          status: "success",
         };
-      return null;
+      else {
+        return {
+          guestName,
+          guestEmail,
+          roomNumber,
+          checkInDate,
+          checkOutDate,
+          status: "failed",
+        };
+      }
     },
   },
 };
