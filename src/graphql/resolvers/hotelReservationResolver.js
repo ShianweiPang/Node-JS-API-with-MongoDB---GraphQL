@@ -1,14 +1,19 @@
 const { getDB } = require("../../../db/connection");
+const { encrypt, decrypt } = require("../../utils/utils");
 const dbName = "sample";
 
 const hotelReservationResolver = {
   Query: {
-    // record: async () => {
-    //   let collection = await getDB().collection("HotelReservations");
-    //   let query = { _id: new ObjectId(id) };
-
-    //   return await collection.findOne(query);
-    // },
+    record: async (_, args, context) => {
+      const hotelRecordId = args.hotelRecordId;
+      let collection = await getDB(dbName).collection("HotelReservation");
+      const record = await collection.findOne({ hotelRecordId: hotelRecordId });
+      record.hotelRecordId = encrypt(record.hotelRecordId);
+      console.log(record.hotelRecordId);
+      const a = decrypt(record.hotelRecordId);
+      console.log(a);
+      return record;
+    },
     records: async (_, __, context) => {
       let collection = await getDB(dbName).collection("HotelReservation");
       const records = await collection.find({}).toArray();
@@ -74,6 +79,17 @@ const hotelReservationResolver = {
           status: "failed",
         };
       }
+    },
+    deleteHotelReservation: async (_, args, context) => {
+      let collection = await getDB(dbName).collection("HotelReservation");
+      const writeResult = await collection.deleteOne(
+        { hotelRecordId: args.hotelRecordId },
+        true
+      );
+      return {
+        acknowledged: writeResult.acknowledged,
+        deletedCount: writeResult.deletedCount,
+      };
     },
   },
 };

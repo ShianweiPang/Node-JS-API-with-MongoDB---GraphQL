@@ -14,8 +14,14 @@ const typeDefs = gql`
     status: String
   }
 
+  type DeleteResponse {
+    acknowledged: Boolean!
+    deletedCount: Int!
+  }
+
   type Query {
     records: [HotelReservation]
+    record(hotelRecordId: String!): HotelReservation
   }
 
   type Mutation {
@@ -26,6 +32,7 @@ const typeDefs = gql`
       checkInDate: Date!
       checkOutDate: Date!
     ): HotelReservation
+    deleteHotelReservation(hotelRecordId: String!): DeleteResponse
   }
 `;
 
