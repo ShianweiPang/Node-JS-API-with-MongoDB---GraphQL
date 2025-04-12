@@ -91,6 +91,24 @@ const hotelReservationResolver = {
         deletedCount: writeResult.deletedCount,
       };
     },
+    updateHotelReservation: async (_, args, context) => {
+      const hotelRecordId = args.hotelRecordId;
+      let collection = await getDB(dbName).collection("HotelReservation");
+      const updateResult = await collection.updateOne(
+        { hotelRecordId: hotelRecordId },
+        {
+          $set: {
+            guestName: args.guestName,
+            guestEmail: args.guestEmail,
+            roomNumber: args.roomNumber,
+            checkInDate: args.checkInDate,
+            checkOutDate: args.checkOutDate,
+          },
+        }
+      );
+      console.log(updateResult);
+      return updateResult;
+    },
   },
 };
 
